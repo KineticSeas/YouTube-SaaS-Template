@@ -1,0 +1,437 @@
+/**
+ * Calendar Styles
+ * Styles for calendar month/week/day views
+ * REQ-CAL-001 through REQ-CAL-304
+ */
+
+/* ========================================
+   Month View Styles
+   ======================================== */
+
+.calendar-month-grid {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.calendar-month-grid th,
+.calendar-month-grid td {
+    width: 14.28%; /* 100% / 7 days */
+    vertical-align: top;
+}
+
+/* Set height on table rows */
+.calendar-week-row {
+    height: 100px;
+}
+
+.calendar-day-cell {
+    height: 100px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.calendar-day-cell:hover {
+    background-color: rgba(13, 110, 253, 0.05) !important;
+    box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.3);
+}
+
+.calendar-day-number {
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.calendar-day-tasks {
+    max-height: 90px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Scrollbar styling for task list in cells */
+.calendar-day-tasks::-webkit-scrollbar {
+    width: 4px;
+}
+
+.calendar-day-tasks::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.calendar-day-tasks::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+/* Task badge in month view */
+.calendar-task-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.calendar-task-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+/* Today cell highlighting */
+.calendar-today {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+    border: 2px solid #0d6efd !important;
+}
+
+.calendar-today .calendar-day-number {
+    color: #0d6efd;
+    font-weight: 700;
+}
+
+/* Other month cells (muted) */
+.calendar-other-month {
+    background-color: #f8f9fa;
+}
+
+.calendar-other-month .calendar-day-number {
+    color: #6c757d;
+}
+
+/* ========================================
+   Week View Styles
+   ======================================== */
+
+.calendar-week-day-card {
+    min-height: 400px;
+}
+
+.calendar-week-day-name {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-week-day-number {
+    font-size: 1.5rem;
+}
+
+.calendar-week-tasks {
+    background-color: #f8f9fa;
+}
+
+.calendar-week-task-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-week-task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ========================================
+   Day View Styles
+   ======================================== */
+
+#calendar-day-view {
+    min-height: 400px;
+}
+
+#calendar-day-task-list .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#calendar-day-task-list .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ========================================
+   Loading Indicator
+   ======================================== */
+
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#calendar-loading {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="dark"] #calendar-loading {
+    background: rgba(43, 45, 49, 0.95);
+    color: #e9ecef;
+}
+
+/* ========================================
+   Dark Mode Support
+   ======================================== */
+
+[data-bs-theme="dark"] .calendar-day-cell {
+    background-color: #2b2d31;
+    color: #e9ecef;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .calendar-day-cell:hover {
+    background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .calendar-other-month {
+    background-color: #313338;
+}
+
+[data-bs-theme="dark"] .calendar-other-month .calendar-day-number {
+    color: #6c757d;
+}
+
+[data-bs-theme="dark"] .calendar-today {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+    border-color: #0d6efd !important;
+}
+
+[data-bs-theme="dark"] .calendar-week-day-card {
+    background-color: #2b2d31;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .calendar-week-tasks {
+    background-color: #313338;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .calendar-task-badge {
+    background-color: #495057;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .calendar-day-tasks::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-bs-theme="dark"] #calendar-month-header th {
+    background-color: #2b2d31;
+    color: #e9ecef;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .calendar-week-day-card .card-header {
+    background-color: #313338;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .badge {
+    background-color: #495057;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .badge.border {
+    background-color: #2b2d31;
+    border-color: #495057 !important;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+/* Mobile devices (< 768px) */
+@media (max-width: 767px) {
+    .calendar-week-row {
+        height: 65px;
+    }
+
+    .calendar-day-cell {
+        height: 65px;
+        padding: 0.5rem !important;
+    }
+
+    .calendar-day-number {
+        font-size: 0.75rem;
+    }
+
+    .calendar-task-badge {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.2rem;
+    }
+
+    /* Hide task text on mobile, show only count dots */
+    .calendar-task-badge {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        padding: 0;
+        margin-right: 2px;
+        display: inline-block;
+        text-indent: -9999px;
+    }
+
+    .calendar-day-tasks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        max-height: 40px;
+    }
+
+    /* Week view on mobile - stack vertically */
+    #calendar-week-grid {
+        flex-direction: column !important;
+    }
+
+    #calendar-week-view .col-lg {
+        max-width: 100%;
+    }
+
+    .calendar-week-day-card {
+        min-height: auto;
+    }
+
+    .calendar-week-tasks {
+        max-height: 300px !important;
+    }
+
+    /* Toolbar adjustments */
+    #calendar-toolbar-content .d-flex {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+
+    #calendar-nav,
+    #calendar-view-toggle {
+        width: 100%;
+    }
+
+    #calendar-nav button,
+    #calendar-view-toggle button {
+        flex: 1;
+    }
+
+    #calendar-period-display {
+        order: -1;
+    }
+}
+
+/* Tablet devices (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .calendar-week-row {
+        height: 83px;
+    }
+
+    .calendar-day-cell {
+        height: 83px;
+    }
+
+    .calendar-task-badge {
+        font-size: 0.7rem;
+    }
+
+    /* Week view - 2 columns */
+    #calendar-week-grid > div {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+/* Desktop devices (>= 992px) */
+@media (min-width: 992px) {
+    .calendar-week-row {
+        height: 100px;
+    }
+
+    .calendar-day-cell {
+        height: 100px;
+    }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+    #calendar-toolbar,
+    #calendar-header,
+    .calendar-task-badge {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .btn,
+    #calendar-view-toggle,
+    .calendar-week-day-card .card-footer {
+        display: none !important;
+    }
+
+    .calendar-day-cell {
+        page-break-inside: avoid;
+    }
+
+    .calendar-today {
+        border: 2px solid #000 !important;
+    }
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+
+/* Focus states for keyboard navigation */
+.calendar-day-cell:focus,
+.calendar-task-badge:focus,
+.calendar-week-task-card:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .calendar-day-cell,
+    .calendar-task-badge,
+    .calendar-week-task-card,
+    #calendar-day-task-list .card {
+        transition: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .calendar-today {
+        border-width: 3px !important;
+    }
+
+    .calendar-task-badge {
+        border: 1px solid currentColor;
+    }
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.badge-sm {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+}
+
+/* Overdue task indicator */
+.border-start.border-danger {
+    border-left-width: 4px !important;
+}
+
+/* Completed task opacity */
+.opacity-50 {
+    opacity: 0.5 !important;
+}
+
+.opacity-75 {
+    opacity: 0.75 !important;
+}

@@ -1,0 +1,650 @@
+# Build Prompts for TodoTracker Application
+
+## Overview
+These prompts should be executed sequentially with Claude Code to build the TodoTracker SaaS application. Each prompt builds upon the previous one, following a logical development progression from foundation to features.
+
+---
+
+## Prompt 1: Project Setup & Database Schema
+
+```
+I'm building a TodoTracker SaaS application using the LAMP stack on Ubuntu 24.04. 
+Please review the following files in my project directory:
+- tech-stack.md
+- requirements.md
+- design-notes.md
+
+Based on these requirements, please:
+
+1. Create the complete directory structure for the application as outlined in tech-stack.md
+
+2. Create a comprehensive database schema (schema.sql) that includes:
+   - users table with all authentication fields
+   - tasks table with all required properties
+   - categories table for user-defined tags
+   - task_categories junction table (many-to-many)
+   - sessions table for secure session management
+   - password_resets table for password recovery
+   - Include all necessary indexes for performance
+   - Include foreign key constraints
+   - Use utf8mb4 character set
+
+3. Create config/database.php with:
+   - Secure database connection using PDO
+   - Environment variable support for credentials
+   - Error handling and connection validation
+   - Database connection class/functions
+
+4. Create a .env.example file showing all required environment variables
+
+5. Create a README.md with initial setup instructions for:
+   - Installing Apache, MySQL, PHP on Ubuntu 24.04
+   - Creating the database and importing schema
+   - Configuring Apache virtual host
+   - Setting file permissions
+
+Please create all these files with complete, production-ready code. Don't use placeholders.
+```
+
+---
+
+## Prompt 2: Authentication System - Registration & Login
+
+```
+Now let's build the complete authentication system. Please create:
+
+1. User registration functionality:
+   - auth/register.php - Registration page with Bootstrap 5.3 form
+   - api/auth/register-process.php - Backend processing with:
+     * Input validation (email format, password strength)
+     * Password hashing with bcrypt
+     * Email uniqueness check
+     * Generate email verification token
+     * Store user in database
+     * Send verification email
+     * CSRF protection
+   - Implement all requirements from REQ-AUTH-001 through REQ-AUTH-007
+
+2. Email verification:
+   - auth/verify-email.php - Verification page that processes tokens
+   - Token validation and expiration checking (24 hour expiry)
+   - Update user status to verified
+
+3. Login functionality:
+   - auth/login.php - Login page with Bootstrap 5.3 form
+   - api/auth/login-process.php - Backend processing with:
+     * Email and password validation
+     * Session creation with secure tokens
+     * "Remember Me" functionality (30 days)
+     * Failed login tracking (lock after 5 attempts)
+     * Require verified email
+   - Implement all requirements from REQ-AUTH-101 through REQ-AUTH-106
+
+4. Session management:
+   - includes/session.php - Session handling functions
+   - Secure session configuration (HttpOnly, Secure, SameSite)
+   - Session validation middleware
+   - Logout functionality
+
+5. Create includes/auth-check.php - Include this at the top of protected pages to verify user is logged in
+
+Use HTMX for form submissions where appropriate. Follow the design from design-notes.md for all forms and pages. Include proper error handling and user feedback with Bootstrap toasts.
+```
+
+---
+
+## Prompt 3: Password Management & User Profile
+
+```
+Building on the authentication system, please create:
+
+1. Forgot Password functionality:
+   - auth/forgot-password.php - Form to request password reset
+   - api/auth/forgot-password-process.php - Generate and email reset token
+   - auth/reset-password.php - Form to set new password with token
+   - api/auth/reset-password-process.php - Validate token and update password
+   - Token expiration after 1 hour
+   - Implement REQ-AUTH-201 through REQ-AUTH-203
+
+2. Change Password functionality:
+   - settings/change-password.php - Password change form in settings
+   - api/auth/change-password-process.php - Verify current password and update
+   - Implement REQ-AUTH-204 through REQ-AUTH-206
+
+3. User Profile Management:
+   - settings/profile.php - Profile page with editable fields
+   - api/user/update-profile.php - Update user information
+   - api/user/upload-avatar.php - Profile picture upload (validate file type/size)
+   - Implement REQ-AUTH-301 through REQ-AUTH-305
+
+4. Email update with re-verification:
+   - If email changes, send verification to new email
+   - Keep old email until new one is verified
+   - Generate new verification token
+
+5. Account deletion:
+   - Confirmation modal with password verification
+   - Soft delete (mark account for deletion in 30 days)
+   - Option to cancel deletion within 30 days
+
+Use Bootstrap 5.3 components from design-notes.md. Include proper validation, CSRF protection, and error handling. Use HTMX for dynamic updates where appropriate.
+```
+
+---
+
+## Prompt 4: Core Application Layout & Navigation
+
+```
+Now let's create the core application layout that all authenticated pages will use. Please create:
+
+1. includes/header.php - Top navigation bar with:
+   - TodoTracker brand/logo
+   - Global search bar (centered) - placeholder for now, we'll implement later
+   - User dropdown menu (right side) with:
+     * Profile link
+     * Settings link
+     * Logout link
+   - Notification bell icon with badge (placeholder for now)
+   - Mobile-responsive hamburger menu
+   - Follow design from design-notes.md navbar section
+
+2. includes/sidebar.php - Left sidebar navigation with:
+   - Dashboard (icon: speedometer) - active by default
+   - All Tasks (icon: list)
+   - Kanban Board (icon: columns)
+   - Calendar (icon: calendar)
+   - Categories (icon: tags)
+   - Archive (icon: archive)
+   - Settings (icon: gear)
+   - Collapsible on mobile (offcanvas)
+   - Active state highlighting
+   - Follow design from design-notes.md sidebar section
+
+3. includes/footer.php - Simple footer with:
+   - Copyright notice
+   - Links to: Privacy Policy, Terms of Service, Help
+
+4. index.php - Main dashboard page (placeholder content for now) that:
+   - Includes auth-check.php to require login
+   - Includes header.php, sidebar.php, footer.php
+   - Has proper HTML5 structure
+   - Loads Bootstrap 5.3, HTMX, Alpine.js, jQuery from CDN
+   - Includes custom CSS file
+   - Sets up proper layout grid
+
+5. assets/css/custom.css - Custom styles for:
+   - Sidebar width and positioning
+   - Main content area with proper margins
+   - Mobile responsive adjustments
+   - Any Bootstrap overrides needed
+
+6. assets/js/app.js - Main JavaScript file with:
+   - Sidebar toggle functionality
+   - Mobile menu handling
+   - Initialize Bootstrap components
+   - HTMX configuration
+
+All pages should be mobile-responsive following design-notes.md. Use Bootstrap Icons from CDN.
+```
+
+---
+
+## Prompt 5: Task CRUD Operations - Create & Read
+
+```
+Now let's implement the core task management functionality. Please create:
+
+1. Database helper functions in includes/task-functions.php:
+   - createTask() - Insert new task with validation
+   - getTasksByUserId() - Fetch all tasks for a user with filters
+   - getTaskById() - Fetch single task by ID and user ID
+   - getUserTaskStats() - Get count by status for dashboard
+   - All functions should use prepared statements
+   - Include proper error handling
+
+2. Task creation functionality:
+   - components/add-task-modal.php - Bootstrap modal with form including:
+     * Title (required, max 255 chars)
+     * Description (optional, textarea, max 5000 chars)
+     * Status dropdown (Pending, In Progress, Completed)
+     * Priority dropdown (Low, Medium, High)
+     * Due date picker
+     * Category multi-select (we'll populate this later)
+     * Save and Cancel buttons
+   - api/tasks/create.php - Process task creation with:
+     * Validation of all inputs
+     * User ownership assignment
+     * CSRF token validation
+     * Return success/error JSON for HTMX
+   - Follow design-notes.md modal section
+   - Implement REQ-TASK-001 through REQ-TASK-008
+
+3. Quick-add task feature:
+   - components/quick-add.php - Simple input group at top of dashboard
+   - Takes just a title, creates task with default values
+   - Uses HTMX for instant submission
+   - Follow design-notes.md quick-add section
+   - Implement REQ-TASK-006
+
+4. Task list display:
+   - components/task-list.php - Reusable component that displays tasks as:
+     * Bootstrap list-group items
+     * Shows title, description (truncated), priority badge, status badge, due date
+     * Edit and Delete buttons for each task
+     * Visual indicator for overdue tasks
+   - Follow design-notes.md task list section
+   - Implement REQ-TASK-101 through REQ-TASK-107
+
+5. Update index.php (dashboard) to include:
+   - Quick-add component at top
+   - Statistics cards showing task counts by status
+   - Recent tasks section (last 10 created/updated)
+   - Add task modal included
+   - Use HTMX to load task list dynamically
+
+Use HTMX for all form submissions and dynamic updates. Include proper validation, error handling, and success feedback with Bootstrap toasts. Follow RESTful principles for API endpoints.
+```
+
+---
+
+## Prompt 6: Task CRUD Operations - Update & Delete
+
+```
+Building on the task CRUD operations, please implement update and delete functionality:
+
+1. Task editing:
+   - Update components/add-task-modal.php to support edit mode:
+     * Modal title changes to "Edit Task" when editing
+     * Form fields pre-populated with task data
+     * Load task data via HTMX when edit button clicked
+   - api/tasks/get.php - Fetch single task as JSON for editing
+   - api/tasks/update.php - Update task with:
+     * Validation of all inputs
+     * Verify user owns the task
+     * Update timestamp tracking
+     * CSRF token validation
+     * Return updated task HTML fragment for HTMX swap
+   - Implement REQ-TASK-201 through REQ-TASK-206
+
+2. Quick status update:
+   - Add one-click status change buttons to task list items
+   - api/tasks/update-status.php - Update only status field with:
+     * Status cycle: Pending → In Progress → Completed
+     * Verify user ownership
+     * Return updated task item HTML for HTMX
+   - Add checkmark button for quick "mark complete"
+   - Implement REQ-TASK-203 and REQ-TASK-204
+
+3. Task deletion:
+   - components/confirm-delete-modal.php - Bootstrap confirmation modal
+   - api/tasks/delete.php - Soft delete task (move to archive) with:
+     * User ownership verification
+     * Update deleted_at timestamp instead of hard delete
+     * CSRF token validation
+     * Return success message
+   - Add delete button with confirmation to task list items
+   - Use HTMX to remove task from DOM after successful deletion
+   - Implement REQ-TASK-301 through REQ-TASK-303
+
+4. Task history tracking:
+   - Create task_history table in a new migration file
+   - Update task-functions.php to log all changes:
+     * Log what changed, old value, new value
+     * Log user and timestamp
+     * Create addTaskHistory() function
+   - Implement REQ-TASK-202
+
+5. Enhanced task-list component:
+   - Add task detail view (expand/collapse or modal)
+   - Show full description when expanded
+   - Display task history/audit log
+   - Add visual states for overdue tasks (red badge/background)
+   - Implement REQ-TASK-106
+
+Update the dashboard to use HTMX for seamless task updates without page reloads. Include proper error handling and user feedback. Use Bootstrap toasts for success/error messages.
+```
+
+---
+
+## Prompt 7: Dashboard with Statistics & Recent Activity
+
+```
+Let's build out a complete, functional dashboard. Please create:
+
+1. Enhanced dashboard statistics (index.php):
+   - Four statistic cards in a row (col-lg-3 col-md-6):
+     * Total Tasks (blue/primary card)
+     * Pending Tasks (yellow/warning card)
+     * In Progress Tasks (cyan/info card)
+     * Completed Tasks (green/success card)
+   - Each card shows:
+     * Large number (count)
+     * Descriptive label
+     * Icon from Bootstrap Icons
+   - Follow design-notes.md statistics section
+   - Implement REQ-DASH-001 through REQ-DASH-005
+
+2. Task statistics functions:
+   - Update includes/task-functions.php with:
+     * getUserTaskStats() - Returns counts by status
+     * getOverdueTasks() - Returns count of overdue tasks
+     * getTasksDueToday() - Returns count of tasks due today
+     * getCompletionRate() - Returns percentage complete
+   - Add these to dashboard display
+
+3. Progress visualization:
+   - Add overall completion progress bar below statistics
+   - Show percentage of completed tasks vs total tasks
+   - Use Bootstrap progress component
+   - Implement REQ-DASH-301 and REQ-DASH-302
+
+4. Recent tasks section:
+   - Display 10 most recently created/updated tasks
+   - Use the task-list component we created earlier
+   - Show in a card with header "Recent Tasks"
+   - Include quick edit/delete actions
+   - Implement REQ-DASH-101 through REQ-DASH-103
+
+5. Upcoming deadlines section:
+   - New card showing tasks due in next 7 days
+   - Sort by due date (soonest first)
+   - Overdue tasks appear at top in red
+   - Show task title, due date, priority badge
+   - Link to open task in modal
+   - Implement REQ-DASH-201 through REQ-DASH-203
+
+6. Quick actions:
+   - Quick-add task input (already created, ensure it's prominent)
+   - Buttons for common actions:
+     * "Add Task" - opens modal
+     * "View All Tasks" - goes to tasks page
+     * "View Calendar" - goes to calendar
+   - Implement REQ-DASH-401 through REQ-DASH-403
+
+7. Real-time updates:
+   - Use HTMX polling or events to update statistics
+   - When task is created/updated/deleted, refresh affected sections
+   - Smooth transitions using HTMX swap animations
+
+Follow the exact layout from design-notes.md dashboard section. Use Bootstrap 5.3 grid and card components. Ensure mobile responsiveness. Add proper loading states with HTMX indicators.
+```
+
+---
+
+## Prompt 8: Category Management System
+
+```
+Now let's implement the category/tag system for organizing tasks. Please create:
+
+1. Database and functions:
+   - The categories and task_categories tables should already exist from schema
+   - Add to includes/task-functions.php:
+     * createCategory($userId, $name, $color) - Create new category
+     * getCategoriesByUserId($userId) - Get all user's categories
+     * updateCategory($id, $userId, $name, $color) - Update category
+     * deleteCategory($id, $userId) - Delete category
+     * assignTaskCategory($taskId, $categoryId) - Link task to category
+     * removeTaskCategory($taskId, $categoryId) - Unlink task from category
+     * getTaskCategories($taskId) - Get all categories for a task
+
+2. Category management page (categories.php):
+   - Main page showing all user categories in a grid/table
+   - Each category shows:
+     * Colored badge/pill with category name
+     * Task count for that category
+     * Edit and Delete buttons
+   - "Add Category" button opens modal
+   - Follow design-notes.md categories section
+   - Implement REQ-CAT-001 through REQ-CAT-007
+
+3. Add/Edit category modal:
+   - components/category-modal.php - Bootstrap modal with:
+     * Category name input (max 50 chars)
+     * Color picker (predefined Bootstrap colors or custom)
+     * Save and Cancel buttons
+   - api/categories/create.php - Create category
+   - api/categories/update.php - Update category
+   - api/categories/delete.php - Delete category (doesn't delete tasks)
+   - Use HTMX for form submissions
+
+4. Category selection in task forms:
+   - Update add-task-modal.php to include category selection:
+     * Multi-select dropdown or tag input
+     * Show categories as colored pills
+     * Allow selecting multiple categories
+   - Update api/tasks/create.php and update.php to:
+     * Save task-category relationships
+     * Handle multiple categories per task
+   - Implement REQ-CAT-101 through REQ-CAT-104
+
+5. Category display in task lists:
+   - Update task-list component to show category badges
+   - Categories displayed as colored pills below task title
+   - Clicking category should filter tasks (implement later)
+   - Follow design-notes.md for category pill styling
+
+6. Category filter functionality:
+   - Add category filter to task list pages
+   - components/category-filter.php - Dropdown or sidebar with all categories
+   - Clicking category filters tasks to show only that category
+   - Support multiple category selection (OR logic)
+   - Show task count per category
+   - Implement REQ-CAT-201 through REQ-CAT-203
+
+Ensure all category operations verify user ownership. Use HTMX for dynamic updates. Include proper validation and error handling. Add success toasts for create/update/delete operations.
+```
+
+---
+
+## Prompt 9: All Tasks View with Filtering & Sorting
+
+```
+Create a comprehensive task management page with full filtering and sorting capabilities:
+
+1. Main tasks page (tasks.php):
+   - Full-width page showing all user tasks
+   - Toggle between list view (table) and grid view (cards)
+   - Top toolbar with:
+     * View toggle buttons (list/grid)
+     * Search input
+     * Filter button (opens filter panel)
+     * Sort dropdown
+     * "Add Task" button
+   - Follow design-notes.md task list view section
+   - Implement REQ-LIST-001 through REQ-LIST-004
+
+2. Table/List view:
+   - Bootstrap table with columns:
+     * Checkbox for bulk selection
+     * Task title (clickable to edit)
+     * Status badge
+     * Priority badge
+     * Due date
+     * Category pills
+     * Action buttons (Edit, Complete, Delete)
+   - Striped rows with hover effect
+   - Responsive (stack on mobile)
+   - Implement REQ-LIST-101 through REQ-LIST-105
+
+3. Grid/Card view:
+   - Bootstrap cards in responsive grid (col-lg-4 col-md-6)
+   - Each card shows:
+     * Priority and status badges at top
+     * Task title and description (truncated)
+     * Due date with icon
+     * Category pills
+     * Action buttons at bottom
+   - Follow design-notes.md grid view section
+   - Implement REQ-LIST-201 through REQ-LIST-203
+
+4. Search functionality:
+   - Real-time search as user types (debounced)
+   - Search in task title and description
+   - Case-insensitive
+   - api/tasks/search.php - Return filtered tasks
+   - Use HTMX to update task display
+   - Implement REQ-LIST-301 through REQ-LIST-305
+
+5. Advanced filtering:
+   - components/filter-panel.php - Offcanvas or sidebar with:
+     * Status checkboxes (Pending, In Progress, Completed)
+     * Priority checkboxes (Low, Medium, High)
+     * Category multi-select
+     * Due date range picker
+     * "Apply Filters" and "Clear Filters" buttons
+   - api/tasks/filter.php - Apply multiple filters (AND logic)
+   - Show active filter count badge
+   - Preserve filter state in session or URL params
+   - Implement REQ-LIST-301 through REQ-LIST-305
+
+6. Sorting:
+   - Sort dropdown with options:
+     * Due date (ascending/descending)
+     * Priority (high to low / low to high)
+     * Created date (newest/oldest)
+     * Title (A-Z / Z-A)
+     * Status
+   - api/tasks/sort.php or handle in filter.php
+   - Show current sort indicator
+   - Implement REQ-LIST-401 through REQ-LIST-403
+
+7. Pagination:
+   - Paginate at 20 tasks per page (default)
+   - Page size selector: 10, 20, 50, 100
+   - Bootstrap pagination component
+   - Show "Showing X-Y of Z tasks"
+   - Implement REQ-LIST-501 through REQ-LIST-504
+
+8. Bulk operations:
+   - Select multiple tasks via checkboxes
+   - Bulk action dropdown: Mark as Complete, Delete, Change Priority, etc.
+   - Confirm before bulk delete
+   - Update all selected tasks via HTMX
+
+Use HTMX for all filtering, sorting, and searching without page reloads. Ensure performance with large task lists. Add loading indicators during operations. Make it fully responsive for mobile.
+```
+
+---
+
+## Prompt 10: Kanban Board View with Drag & Drop
+
+```
+Create an interactive Kanban board for visual task management:
+
+1. Kanban board page (kanban.php):
+   - Full-width layout with three columns:
+     * Pending (yellow/warning theme)
+     * In Progress (cyan/info theme)
+     * Completed (green/success theme)
+   - Each column is a Bootstrap card
+   - Column headers show:
+     * Status name
+     * Task count badge
+     * Column is vertically scrollable
+   - Follow design-notes.md kanban section exactly
+   - Implement REQ-KANBAN-001 through REQ-KANBAN-004
+
+2. Kanban task cards:
+   - Each task displayed as a card within the column:
+     * Colored left border indicating priority (red=high, yellow=medium, gray=low)
+     * Task title (truncated if long)
+     * Brief description (first 100 chars)
+     * Due date badge at bottom
+     * Priority badge
+     * Category pills
+     * Overdue indicator if applicable
+   - Cards have shadow and hover effect
+   - Clicking card opens task edit modal
+   - Follow design-notes.md kanban card design
+   - Implement REQ-KANBAN-101 through REQ-KANBAN-104
+
+3. Drag and drop functionality:
+   - Make task cards draggable within and between columns
+   - Use HTMX with hx-trigger for drag events OR
+   - Use Alpine.js with Sortable.js library for drag-drop
+   - Visual feedback during drag:
+     * Card becomes semi-transparent
+     * Target column highlights
+     * Drop zones indicated
+   - api/tasks/move.php - Update task status when dropped in new column
+   - Verify user ownership before update
+   - Implement REQ-KANBAN-201 through REQ-KANBAN-205
+
+4. Drag-drop implementation approach:
+   - Add data attributes to cards: data-task-id, data-status
+   - Use HTMX hx-trigger="drop" on drop zones
+   - On drop, send AJAX request to update task status
+   - On success, card stays in new column
+   - On failure, card returns to original column with error toast
+   - Add smooth CSS transitions for card movement
+
+5. Kanban filtering:
+   - Add filter button at top of page
+   - Filter by:
+     * Priority (show only High, Medium, or Low)
+     * Category (show tasks with specific category)
+     * Search (filter by title/description)
+   - Filters apply across all columns
+   - Implement REQ-KANBAN-301 through REQ-KANBAN-303
+
+6. Column sorting:
+   - Add sort dropdown for each column
+   - Sort options:
+     * Due date (soonest first)
+     * Priority (high to low)
+     * Recently updated
+   - Sort applies per column independently
+
+7. Mobile responsive design:
+   - On mobile, columns stack vertically OR
+   - Columns scroll horizontally
+   - Drag-drop may be disabled on touch devices (tap to move instead)
+   - Add "Move to" dropdown on mobile as alternative to drag-drop
+
+8. Empty state:
+   - If column has no tasks, show friendly empty state message
+   - "Drop tasks here" or "No tasks in this status"
+   - Add quick "Add Task" button in empty columns
+
+Include loading states while tasks are being moved. Add success/error toasts. Ensure smooth animations. Make the board feel responsive and interactive. This is a key feature, so polish is important!
+```
+
+---
+
+## Summary
+
+These 10 prompts provide a systematic approach to building the TodoTracker application:
+
+1. **Foundation**: Project structure, database, configuration
+2. **Auth Core**: Registration and login
+3. **Auth Extended**: Password management and profiles
+4. **Layout**: Application shell and navigation
+5. **Tasks Core**: Create and read operations
+6. **Tasks Extended**: Update and delete operations
+7. **Dashboard**: Statistics and overview
+8. **Categories**: Organization system
+9. **Task Management**: Advanced filtering and sorting
+10. **Kanban**: Visual task management
+
+## Next Steps (Prompts 11+)
+
+After these foundational prompts, continue with:
+- **Prompt 11**: Calendar view with task scheduling
+- **Prompt 12**: Search functionality (global search)
+- **Prompt 13**: Notifications system (email and in-app)
+- **Prompt 14**: Settings page (preferences, theme, etc.)
+- **Prompt 15**: Archive and trash management
+- **Prompt 16**: Data export (CSV/JSON)
+- **Prompt 17**: Email system setup (verification, notifications)
+- **Prompt 18**: Security hardening and testing
+- **Prompt 19**: Performance optimization
+- **Prompt 20**: Deployment preparation and documentation
+
+## Tips for Using These Prompts
+
+1. **Execute sequentially** - Each builds on the previous
+2. **Review output** - Check that Claude Code created all files before moving on
+3. **Test as you go** - Verify functionality after each prompt
+4. **Adjust as needed** - If something doesn't work, ask Claude Code to fix it before proceeding
+5. **Reference docs** - Claude Code will reference the three .md files you created
+6. **Be specific** - If Claude Code's output doesn't match requirements, point to specific REQ-* identifiers
