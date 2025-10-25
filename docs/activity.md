@@ -4913,3 +4913,22 @@ Removed the Help link from the footer and adjusted spacing on the remaining link
 ### Status
 **Help Link Removal**: ✅ COMPLETE
 **Git Commit**: Pending
+
+---
+
+## 2025-10-24: Update Landing Page Hero Subtitle Text
+
+### Prompt
+"On the landing page change 'Your all-in-one task management solution. Organize your work, track your progress, and achieve your goals with ease.' to 'Your basic SaaS template for a traditional LAMP stack using Bootstrap, HTMX, and Alpine.js'"
+
+### Changes Made
+Updated the hero subtitle text on the landing page to reflect the template nature of the project.
+
+### Files Modified
+- `/html/index.php` (line 25)
+  - Changed from: "Your all-in-one task management solution. Organize your work, track your progress, and achieve your goals with ease."
+  - Changed to: "Your basic SaaS template for a traditional LAMP stack using Bootstrap, HTMX, and Alpine.js"
+
+### Status
+**Hero Text Update**: ✅ COMPLETE
+**Git Commit**: Pending

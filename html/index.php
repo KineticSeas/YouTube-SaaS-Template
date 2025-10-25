@@ -22,7 +22,7 @@ require_once 'includes/header.php';
                 <i class="bi bi-check-circle-fill text-primary"></i> TodoTracker
             </h1>
             <p id="hero-subtitle" class="lead mb-4">
-                Your all-in-one task management solution. Organize your work, track your progress, and achieve your goals with ease.
+                Your basic SaaS template for a traditional LAMP stack using Bootstrap, HTMX, and Alpine.js
             </p>
             <div id="hero-buttons" class="d-grid gap-3 d-sm-flex">
                 <a id="get-started-btn" href="/auth/register.php" class="btn btn-primary btn-lg px-4">
